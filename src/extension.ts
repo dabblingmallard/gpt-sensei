@@ -3,6 +3,7 @@ import { getGlobalState } from './global-state';
 import { createUiPanel, getPanelJS, getHtml } from './ui';
 import { createOpenAiApi, getCompletion } from './openai-api';
 import { Extension, getFileLanguage, getLastPart } from './utils/language-names';
+import { systemMessage } from './utils/prompts';
 
 export function activate(context: vscode.ExtensionContext) {
 	const globalState = getGlobalState(context);
@@ -28,10 +29,10 @@ export function activate(context: vscode.ExtensionContext) {
 		if (extension) {
 			languageName = getFileLanguage(extension as Extension);
 			if (!languageName) {
-				languageName = `.${extension} file`;
+				languageName = `${extension} file`;
 			}
 		}
-		panel.webview.postMessage({ command: 'updateSystemInput', fileName, languageName });
+		panel.webview.postMessage({ command: 'updateSystemInput', systemMessage: systemMessage({ languageName, fileName }) });
 	}
 
 	vscode.window.onDidChangeTextEditorSelection((event) => {

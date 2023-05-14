@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react';
 import { InputForm } from './components/InputForm';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { ResponseContainer } from './components/ResponseContainer';
-import { systemMessage } from './utils/prompts';
 
 const App = () => {
-    const [systemInput, setSystemInput] = useState('');
-    const [promptInput, setPromptInput] = useState('');
+    const [input, setInput] = useState({ systemInput: '', promptInput: '' });
     const [isLoading, setIsLoading] = useState(false);
     const [response, setResponse] = useState('');
 
@@ -20,7 +18,7 @@ const App = () => {
             }
 
             if (message.command === 'updateSystemInput') {
-                setSystemInput(systemMessage(message))
+                setInput({ ...input, systemInput: message.systemMessage })
             }
         });
     }, [])
@@ -30,24 +28,31 @@ const App = () => {
 
         window.vscode.postMessage({
             command: 'submit',
-            systemContent: systemInput,
-            promptContent: promptInput
+            systemContent: input.systemInput,
+            promptContent: input.promptInput
         });
     };
 
     return (
-        <div className="bg-gray-900 text-white h-full w-full p-5" style={{ height: '100vh', width: '100vw' }}>
+        <div className="bg-gray-900 text-white h-full w-full p-5" style={{ minHeight: '100vh', minWidth: '100vw' }}>
             <InputForm
-                systemInput={systemInput}
-                onSystemInputChange={setSystemInput}
-                promptInput={promptInput}
-                onPromptInputChange={setPromptInput}
-                onSubmit={handleSubmit}
+                label="System input"
+                value={input.systemInput}
+                onChange={(newValue: string) => setInput({ ...input, systemInput: newValue })}
             />
-            {isLoading ? <LoadingIndicator /> : <ResponseContainer response={response} />}
+            <InputForm
+                label="Prompt input"
+                value={input.promptInput}
+                onChange={(newValue: string) => setInput({ ...input, promptInput: newValue })}
+            />
+            <div>
+                <button onClick={handleSubmit} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+                    {isLoading ? <LoadingIndicator /> : 'Submit'}
+                </button>
+                <ResponseContainer response={response} />
+            </div>
         </div >
     );
 };
 
 export default App;
-

@@ -2,7 +2,7 @@
   "name": "gpt-sensei",
   "displayName": "GPT Sensei",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "dabblingmallard",
   "repository": {
     "url": "https://github.com/dabblingmallard/gpt-sensei.git",
@@ -29,6 +29,12 @@
             "type": "string",
             "default": "",
             "description": "Your OpenAI API Key",
+            "scope": "window"
+          },
+          "gptSensei.systemMessage": {
+            "type": "string",
+            "default": "You are a ${languageName} expert. Your response will be placed in a file called '${fileName}' You only write code and do not provide explanations.",
+            "description": "A default system message. ${languageName} and ${fileName} will be replaced with the current editors language (.js => JavaScript etc.) and the file name.",
             "scope": "window"
           }
         }
