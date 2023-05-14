@@ -34,8 +34,6 @@ export const getFileLanguage = (extension: Extension): Language | null => {
             return "CSS";
         case ".go":
             return "Go";
-        case ".scala":
-            return "Scala";
         case ".swift":
             return "Swift";
         case ".dart":
