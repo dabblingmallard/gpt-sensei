@@ -3,6 +3,7 @@
   "displayName": "GPT Sensei",
   "description": "",
   "version": "0.0.1",
+  "publisher": "dabblingmallard",
   "repository": "https://github.com/dabblingmallard/gpt-sensei.git",
   "engines": {
     "vscode": "^1.76.2"
