@@ -1,8 +1,9 @@
 {
-  "name": "helloworld",
-  "displayName": "HelloWorld",
+  "name": "gpt-sensei",
+  "displayName": "GPT Sensei",
   "description": "",
   "version": "0.0.1",
+  "repository": "https://github.com/dabblingmallard/gpt-sensei.git",
   "engines": {
     "vscode": "^1.76.2"
   },
@@ -42,7 +43,7 @@
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
-    "@types/vscode": "^1.77.0",
+    "@types/vscode": "^1.76.2",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
     "@vscode/test-electron": "^2.3.0",

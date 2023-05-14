@@ -36,7 +36,7 @@ const App = () => {
     };
 
     return (
-        <div className="bg-gray-900 text-white">
+        <div className="bg-gray-900 text-white h-full w-full p-5" style={{ height: '100vh', width: '100vw' }}>
             <InputForm
                 systemInput={systemInput}
                 onSystemInputChange={setSystemInput}
@@ -45,7 +45,7 @@ const App = () => {
                 onSubmit={handleSubmit}
             />
             {isLoading ? <LoadingIndicator /> : <ResponseContainer response={response} />}
-        </div>
+        </div >
     );
 };
 

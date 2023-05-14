@@ -34,8 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
 		panel.webview.postMessage({ command: 'updateSystemInput', fileName, languageName });
 	}
 
-	console.log('hey');
-
 	vscode.window.onDidChangeTextEditorSelection((event) => {
 		updateSystemInput();
 	}, null, context.subscriptions);
@@ -55,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 				let selectionContent = '';
 				for (let e of editors) {
 					selectionContent = e.selection ? e.document.getText(e.selection) : '';
-					if (selectionContent) {
+					if (selectionContent || e.selection.active) {
 						editor = e;
 					}
 				}
@@ -79,11 +77,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 				if (editor) {
 					const selection = editor.selection;
-					if (!selection.isEmpty) {
-						await editor.edit((editBuilder) => {
-							editBuilder.replace(selection, responseText);
-						});
-					}
+					await editor.edit((editBuilder) => {
+						editBuilder.replace(selection, responseText);
+					});
 				}
 
 				panel!.webview.postMessage({ command: 'showResponse', content: responseText });
