@@ -25,15 +25,9 @@
       {
         "title": "GPT Sensei",
         "properties": {
-          "gptSensei.apiKey": {
-            "type": "string",
-            "default": "",
-            "description": "Your OpenAI API Key",
-            "scope": "window"
-          },
           "gptSensei.systemMessage": {
             "type": "string",
-            "default": "You are a ${languageName} expert. Your response will be placed in a file called '${fileName}' You only write code and do not provide explanations.",
+            "default": "You are a ${languageName} expert. Your response will be placed in a file called '${fileName}'. You only write code and do not provide explanations.",
             "description": "A default system message. ${languageName} and ${fileName} will be replaced with the current editors language (.js => JavaScript etc.) and the file name.",
             "scope": "window"
           }

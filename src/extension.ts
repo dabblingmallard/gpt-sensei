@@ -1,21 +1,48 @@
 import * as vscode from 'vscode';
-import { getGlobalState } from './global-state';
 import { createUiPanel, getPanelJS, getHtml } from './ui';
 import { createOpenAiApi, getCompletion } from './openai-api';
-import { Extension, getFileLanguage, getLastPart } from './utils/language-names';
+import { Extension, getFileLanguage, getLastPart, getMarkdownLanguage } from './utils/language-names';
 import { systemMessage } from './utils/prompts';
+import { AuthStorage } from './utils/auth-storage';
+import { OpenAIApi } from 'openai';
 
-export function activate(context: vscode.ExtensionContext) {
-	const globalState = getGlobalState(context);
-	const openai = createOpenAiApi(globalState.apiKey);
+export async function activate(context: vscode.ExtensionContext) {
+	AuthStorage.init(context);
+	const auth = AuthStorage.instance;
+	let openai: OpenAIApi | null;
+
+	const checkToken = async () => {
+		const token = await auth.getAuthData();
+		if (token) {
+			openai = createOpenAiApi(token);
+		} else {
+			vscode.window.showErrorMessage("API key not set. Please use the 'gptSensei.setToken' command to set the API key.");
+			await vscode.commands.executeCommand("gptSensei.setToken");
+		}
+	};
+
+	vscode.commands.registerCommand("gptSensei.setToken", async () => {
+		const tokenInput = await vscode.window.showInputBox({
+			placeHolder: "OpenAI API KEY"
+		});
+		await auth.storeAuthData(tokenInput);
+		if (tokenInput) {
+			openai = createOpenAiApi(tokenInput);
+		}
+	});
+
+	await checkToken();
 
 	let myButton = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 0);
 	myButton.text = 'GPT SENSEI';
 	myButton.tooltip = 'Click to get code from GPT';
-	myButton.command = 'extension.showTextArea';
+	myButton.command = 'gptSensei.showSenseiWindow';
 	myButton.show();
 
 	let panel: vscode.WebviewPanel | undefined;
+	let languageName: string | null;
+	let fileName: string | null;
+	let extension: string | null;
 
 	function updateSystemInput(): void {
 		if (!panel) {
@@ -23,9 +50,8 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 
 		const activeEditor = vscode.window.activeTextEditor;
-		const fileName = getLastPart(activeEditor?.document.fileName || '');
-		const extension = `.${fileName.split('.').pop()}`;
-		let languageName;
+		fileName = getLastPart(activeEditor?.document.fileName || '');
+		extension = `.${fileName.split('.').pop()}`;
 		if (extension) {
 			languageName = getFileLanguage(extension as Extension);
 			if (!languageName) {
@@ -40,21 +66,30 @@ export function activate(context: vscode.ExtensionContext) {
 	}, null, context.subscriptions);
 
 
-	let disposable = vscode.commands.registerCommand('extension.showTextArea', async function () {
+	let disposable = vscode.commands.registerCommand('gptSensei.showSenseiWindow', async function () {
 		panel = createUiPanel('GPT SENSEI');
 		const jsContent = getPanelJS(context);
 		panel.webview.html = getHtml(context.extensionUri, jsContent);
 
 		panel.webview.onDidReceiveMessage(async (message) => {
 			if (message.command === 'submit') {
+				await checkToken();
+				if (!openai) {
+					panel!.webview.postMessage({ command: 'setLoading', isLoading: false });
+					return;
+				}
+
 				const { systemContent, promptContent } = message;
 
 				const editors = vscode.window.visibleTextEditors;
 				let editor = null;
+				let selection: vscode.Selection | null = null;
 				let selectionContent = '';
+				const responseMeta = extension ? { markdownPreLangTag: getMarkdownLanguage(extension as Extension) } : {};
 				for (let e of editors) {
 					selectionContent = e.selection ? e.document.getText(e.selection) : '';
 					if (selectionContent || e.selection.active) {
+						selection = e.selection;
 						editor = e;
 					}
 				}
@@ -66,24 +101,25 @@ export function activate(context: vscode.ExtensionContext) {
 				].filter(m => !!m.content);
 
 				if (!messages.length) {
-					panel!.webview.postMessage({ command: 'showResponse', content: '' });
+					panel!.webview.postMessage({ command: 'setLoading', isLoading: false });
 					return;
 				}
 
 
 				const responseText = await getCompletion(openai, messages);
 				if (!responseText) {
+					panel!.webview.postMessage({ command: 'setLoading', isLoading: false });
 					return;
 				}
 
-				if (editor) {
-					const selection = editor.selection;
+				if (editor && selection) {
 					await editor.edit((editBuilder) => {
-						editBuilder.replace(selection, responseText);
+						editBuilder.replace(selection!, responseText);
 					});
 				}
 
-				panel!.webview.postMessage({ command: 'showResponse', content: responseText });
+				panel!.webview.postMessage({ command: 'setLoading', isLoading: false });
+				panel!.webview.postMessage({ command: 'showResponse', content: responseText, ...responseMeta });
 			}
 		}, undefined, context.subscriptions);
 	});
