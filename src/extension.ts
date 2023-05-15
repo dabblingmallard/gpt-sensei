@@ -61,15 +61,19 @@ export async function activate(context: vscode.ExtensionContext) {
 		panel.webview.postMessage({ command: 'updateSystemInput', systemMessage: systemMessage({ languageName, fileName }) });
 	}
 
-	vscode.window.onDidChangeTextEditorSelection((event) => {
-		updateSystemInput();
-	}, null, context.subscriptions);
 
 
 	let disposable = vscode.commands.registerCommand('gptSensei.showSenseiWindow', async function () {
 		panel = createUiPanel('GPT SENSEI');
 		const jsContent = getPanelJS(context);
 		panel.webview.html = getHtml(context.extensionUri, jsContent);
+
+		let autoSystemInput = true;
+		vscode.window.onDidChangeTextEditorSelection(() => {
+			if (autoSystemInput) {
+				updateSystemInput();
+			}
+		}, null, context.subscriptions);
 
 		panel.webview.onDidReceiveMessage(async (message) => {
 			if (message.command === 'submit') {
@@ -126,6 +130,8 @@ export async function activate(context: vscode.ExtensionContext) {
 					language: message.language
 				})
 					.then(doc => vscode.window.showTextDocument(doc));
+			} else if (message.command === 'setAutoSystemInput') {
+				autoSystemInput = message.autoSystemInput;
 			}
 		}, undefined, context.subscriptions);
 	});

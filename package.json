@@ -27,7 +27,7 @@
         "properties": {
           "gptSensei.systemMessage": {
             "type": "string",
-            "default": "You are a ${languageName} expert. Your response will be placed in a file called '${fileName}'. I want you to only write valid ${languageName} code. Do not provide explanations. Do not write Markdown.",
+            "default": "Imagine you are a ${languageName} programmer working on a coding project. You need to write a block of code that performs a specific task. Write out the code as if you are explaining it to someone who is already familiar with the language you are using. Make sure to only provide the necessary code without any additional explanations or comments. Focus on writing clean and concise code to efficiently achieve the desired task.",
             "description": "A default system message. ${languageName} and ${fileName} will be replaced with the current editors language (.js => JavaScript etc.) and the file name.",
             "scope": "window"
           }

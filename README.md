@@ -10,16 +10,6 @@ This extension provides a simple way to leverage the power of OpenAI's GPT langu
 
 To use GPT Sensei, you will need to provide your OpenAI API key in `settings.json` as `gptSensei.apiKey`. You can also customize the default system message that appears when you invoke the GPT Sensei command. The system message is updated every time the selection changes in an editor, and can contain variables that will be replaced with the current language name and file name.
 
-By default, the system message is:
-
-```
-You are a ${languageName} expert.
-Your response will be placed in a file called '${fileName}'.
-I want you to only write valid ${languageName} code.
-Do not provide explanations.
-Do not write Markdown.
-```
-
 ## Usage
 
 To use GPT Sensei, follow these steps:
