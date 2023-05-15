@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-type LanguageId = "javascriptreact" | "typescriptreact" | "abap" | "bat" | "clojure" | "coffeescript" | "cpp" | "csharp" | "css" | "dockerfile" | "fsharp" | "go" | "graphql" | "handlebars" | "html" | "ini" | "java" | "javascript" | "json" | "lua" | "markdown" | "objective-c" | "perl" | "php" | "plaintext" | "powershell" | "python" | "r" | "razor" | "ruby" | "rust" | "scss" | "shellscript" | "solidity" | "sql" | "swift" | "typescript" | "vb" | "xml" | "yaml";
+export type LanguageId = "javascriptreact" | "typescriptreact" | "abap" | "bat" | "clojure" | "coffeescript" | "cpp" | "csharp" | "css" | "dockerfile" | "fsharp" | "go" | "graphql" | "handlebars" | "html" | "ini" | "java" | "javascript" | "json" | "lua" | "markdown" | "objective-c" | "perl" | "php" | "plaintext" | "powershell" | "python" | "r" | "razor" | "ruby" | "rust" | "scss" | "shellscript" | "solidity" | "sql" | "swift" | "typescript" | "vb" | "xml" | "yaml";
 
 interface LanguageOption {
     label: string;
@@ -51,22 +51,22 @@ const languages: LanguageOption[] = [
 ];
 
 interface LanguageSelectProps {
-    onChange: (id: string) => void;
+    value: LanguageId;
+    onChange: (id: LanguageId) => void;
 }
 
-export const LanguageSelect = ({ onChange }: LanguageSelectProps) => {
-    const [selectedLanguage, setSelectedLanguage] = useState<LanguageId>(languages[0].value);
+export const LanguageSelect = ({ value, onChange }: LanguageSelectProps) => {
 
     const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedLanguage(event.target.value as LanguageId);
-        onChange(event.target.value);
+        const v = event.target.value as LanguageId
+        onChange(v);
     };
 
     return (
-        <div className="w-64 px-4 py-2 bg-gray-800 text-gray-200 rounded-md relative">
+        <div className="inline-flex rounded-md shadow-sm">
             <select
-                className="w-full h-full p-2 pr-8 cursor-pointer appearance-none bg-transparent border-none focus:outline-none"
-                value={selectedLanguage}
+                className="inline-flex items-center px-2 py-1 border border-gray-600 bg-gray-800 text-xs font-medium rounded-sm text-gray-300 hover:text-gray-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                value={value}
                 onChange={handleLanguageChange}
             >
                 {languages.map((language) => (
@@ -75,17 +75,6 @@ export const LanguageSelect = ({ onChange }: LanguageSelectProps) => {
                     </option>
                 ))}
             </select>
-            <div
-                className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none"
-            >
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path
-                        fillRule="evenodd"
-                        clipRule="evenodd"
-                        d="M6.293 7.707a1 1 0 01-1.414 1.414L2.586 6.414a1 1 0 010-1.414L4.879 2.29a1 1 0 111.414 1.414L4.828 5H13a1 1 0 010 2H4.828l1.465 1.293a1 1 0 11-1.414 1.414z"
-                    />
-                </svg>
-            </div>
         </div>
     );
 };
