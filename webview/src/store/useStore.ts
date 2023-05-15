@@ -33,11 +33,12 @@ export const useStore = create(
         }
     )
 );
-export const onSubmitRequest = (systemInput: string, promptInput: string) => {
+export const onSubmitRequest = (systemInput: string, promptInput: string, replace?: boolean) => {
     window.vscode.postMessage({
         command: 'submit',
         systemContent: systemInput,
-        promptContent: promptInput
+        promptContent: promptInput,
+        replace,
     });
 }
 

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { deleteResponse, openCustomVscodeEditor, Response } from '../store/useStore';
+import { deleteResponse, openCustomVscodeEditor, Response, useStore } from '../store/useStore';
 import { FaRegTrashAlt, FaAngleUp } from 'react-icons/fa';
 import { RiCodeSSlashLine } from 'react-icons/ri'
+import { LanguageSelect } from './LanguageSelect';
 
 type ResponseContainerProps = {
     responses: Response[];
@@ -24,10 +25,9 @@ export const ResponseContainer: React.FC<ResponseContainerProps> = ({ responses 
                 <div key={index} className="mb-4 w-full">
                     <div className="flex justify-between items-center" onClick={() => toggleResponse(index)}>
                         <FaAngleUp
-                            className={`h-5 w-5 mr-3 ${expandedResponses.includes(index) ? 'rotate-180' : ''}`}
+                            className={`h-5 w-5 mr-2 ${expandedResponses.includes(index) ? 'rotate-180' : ''}`}
                         />
-                        <h3 className="text-lg font-medium overflow-hidden whitespace-nowrap overflow-ellipsis">
-                            {response.language}
+                        <h3 className="align-left flex-grow text-lg font-medium overflow-hidden whitespace-nowrap overflow-ellipsis">
                             {response.prompt?.length ? response.prompt : response.content}
                         </h3>
                         <div className="flex items-center space-x-4">
@@ -42,7 +42,6 @@ export const ResponseContainer: React.FC<ResponseContainerProps> = ({ responses 
                             </button>
                         </div>
                     </div>
-
                     <div className={`mt-2 ${expandedResponses.includes(index) ? "" : "hidden"}`}>
                         <pre className="language-javascript">
                             {response.content}

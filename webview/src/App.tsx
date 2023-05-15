@@ -4,6 +4,7 @@ import { LoadingIndicator } from './components/LoadingIndicator';
 import { ResponseContainer } from './components/ResponseContainer';
 import { onSubmitRequest, useStore } from './store/useStore';
 import { IoMdSettings } from 'react-icons/io'
+import { RadioSwitch } from './components/RadioSwitch';
 
 if (!window.vscode) {
     window.vscode = {
@@ -21,6 +22,7 @@ const App = () => {
     const systemInput = useStore(state => state.systemInput);
     const responses = useStore(state => state.responses)
     const [isLoading, setIsLoading] = useState(false);
+    const [replace, setReplace] = useState(true);
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     useEffect(() => {
@@ -58,7 +60,7 @@ const App = () => {
 
     const handleSubmit = async () => {
         setIsLoading(true);
-        onSubmitRequest(systemInput, promptInput)
+        onSubmitRequest(systemInput, promptInput, replace)
     };
 
     return (
@@ -67,15 +69,18 @@ const App = () => {
                 <div>
                     <h1 className="text-3xl font-bold">GPT Sensei</h1>
                 </div>
-                <div className="relative">
-                    <button onClick={handleSettingsButtonClick} className="rounded-full h-8 w-8 bg-gray-800 text-white focus:outline-none flex justify-center items-center">
-                        <IoMdSettings size={24} />
-                    </button>
-                    {isSettingsOpen && (
-                        <div className="absolute top-8 right-0 w-40 overflow-hidden rounded shadow-lg bg-white z-10">
-                            <button onClick={handleClearStorageClick} className="w-full py-2 px-4 text-gray-700 hover:bg-gray-100">Clear all storage</button>
-                        </div>
-                    )}
+                <div className="flex flex-row space-x-5">
+                    <RadioSwitch value={replace} setValue={setReplace} label="Replace selection" />
+                    <div className="relative">
+                        <button onClick={handleSettingsButtonClick} className="rounded-full h-8 w-8 bg-gray-800 text-white focus:outline-none flex justify-center items-center">
+                            <IoMdSettings size={24} />
+                        </button>
+                        {isSettingsOpen && (
+                            <div className="absolute top-8 right-0 w-40 overflow-hidden rounded shadow-lg bg-white z-10">
+                                <button onClick={handleClearStorageClick} className="w-full py-2 px-4 text-gray-700 hover:bg-gray-100">Clear all storage</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
             <InputForm

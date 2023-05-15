@@ -112,7 +112,7 @@ export async function activate(context: vscode.ExtensionContext) {
 					return;
 				}
 
-				if (editor && selection) {
+				if (message.replace && editor && selection) {
 					await editor.edit((editBuilder) => {
 						editBuilder.replace(selection!, responseText);
 					});
