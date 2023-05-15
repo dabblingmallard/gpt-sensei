@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { createUiPanel, getPanelJS, getHtml } from './ui';
 import { createOpenAiApi, getCompletion } from './openai-api';
-import { Extension, getFileLanguage, getLastPart, getMarkdownLanguage } from './utils/language-names';
+import { Extension, getFileLanguage, getLastPart } from './utils/language-names';
 import { systemMessage } from './utils/prompts';
 import { AuthStorage } from './utils/auth-storage';
 import { OpenAIApi } from 'openai';
@@ -82,10 +82,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				const { systemContent, promptContent } = message;
 
 				const editors = vscode.window.visibleTextEditors;
-				let editor = null;
+				let editor: vscode.TextEditor | null = null;
 				let selection: vscode.Selection | null = null;
 				let selectionContent = '';
-				const responseMeta = extension ? { markdownPreLangTag: getMarkdownLanguage(extension as Extension) } : {};
 				for (let e of editors) {
 					selectionContent = e.selection ? e.document.getText(e.selection) : '';
 					if (selectionContent || e.selection.active) {
@@ -93,6 +92,7 @@ export async function activate(context: vscode.ExtensionContext) {
 						editor = e;
 					}
 				}
+				const responseMeta = extension ? { system: systemContent, prompt: promptContent, language: editor?.document.languageId } : {};
 
 				const messages = [
 					{ role: 'system' as const, content: systemContent },
@@ -120,6 +120,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
 				panel!.webview.postMessage({ command: 'setLoading', isLoading: false });
 				panel!.webview.postMessage({ command: 'showResponse', content: responseText, ...responseMeta });
+			} else if (message.command === 'openResponseInEditor') {
+				vscode.workspace.openTextDocument({
+					content: message.content,
+					language: message.language
+				})
+					.then(doc => vscode.window.showTextDocument(doc));
 			}
 		}, undefined, context.subscriptions);
 	});

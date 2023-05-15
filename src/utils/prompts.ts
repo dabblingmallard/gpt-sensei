@@ -9,6 +9,6 @@ export const systemMessage = (message: any = {}) => {
     const fileName = message.fileName ?? '';
 
     return defaultSystemMessage
-        .replace('${languageName}', languageName)
-        .replace('${fileName}', fileName);
+        .replace(/\$\{languageName\}/g, languageName)
+        .replace(/\$\{fileName\}/g, fileName);
 };

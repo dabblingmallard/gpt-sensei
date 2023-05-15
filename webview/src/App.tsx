@@ -2,17 +2,15 @@ import { useEffect, useState } from 'react';
 import { InputForm } from './components/InputForm';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { ResponseContainer } from './components/ResponseContainer';
-import { useStore } from './store/useStore';
+import { onSubmitRequest, useStore } from './store/useStore';
 import { IoMdSettings } from 'react-icons/io'
 
 if (!window.vscode) {
     window.vscode = {
         postMessage: (message: any) => {
-            console.log(message)
             const event = new MessageEvent<{ command: string; content: string }>('message', {
                 data: { command: 'showResponse', content: message.promptContent }
             });
-            console.log(event)
             window.dispatchEvent(event);
         },
     };
@@ -49,17 +47,18 @@ const App = () => {
 
     const handleClearStorageClick = () => {
         useStore.persist.clearStorage()
+        useStore.setState({
+            prompts: [],
+            promptInput: '',
+            systemInput: '',
+            responses: []
+        })
         setIsSettingsOpen(false);
     };
 
     const handleSubmit = async () => {
         setIsLoading(true);
-
-        window.vscode.postMessage({
-            command: 'submit',
-            systemContent: systemInput,
-            promptContent: promptInput
-        });
+        onSubmitRequest(systemInput, promptInput)
     };
 
     return (
